@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+release/
+
+# Environment files
+.env
+.env.local
+
+# Saved password (security)
+.password
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# User data (optional - uncomment if you don't want to commit your tracking data)
+# tracker_data/
+
+# Temporary files
+tmpclaude-*
+nul
+
+# Claude Code
+.claude/
