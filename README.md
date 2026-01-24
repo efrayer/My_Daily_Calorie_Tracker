@@ -401,6 +401,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 For questions, suggestions, or support:
 
+- **Design and Development:** Eric Frayer - info@ericfrayer.com - www.ericfrayer.com
 - **GitHub Issues:** [Report a bug or request a feature](https://github.com/efrayer/My_Daily_Calorie_Tracker/issues)
 - **Repository:** [View source code](https://github.com/efrayer/My_Daily_Calorie_Tracker)
 
