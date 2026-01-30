@@ -14,6 +14,7 @@ interface DashboardProps {
 }
 
 function Dashboard({ appData, onDataChange, onOpenWeightTracker }: DashboardProps) {
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayDateString());
   const [todayEntry, setTodayEntry] = useState<DailyEntry | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showMealLogger, setShowMealLogger] = useState(false);
@@ -24,20 +25,20 @@ function Dashboard({ appData, onDataChange, onOpenWeightTracker }: DashboardProp
   const today = getTodayDateString();
 
   useEffect(() => {
-    loadTodayEntry();
-  }, []);
+    loadEntryForDate(selectedDate);
+  }, [selectedDate]);
 
-  const loadTodayEntry = async () => {
+  const loadEntryForDate = async (date: string) => {
     setIsLoading(true);
     try {
-      const entries = await window.electronAPI.getDailyEntries(today, today);
+      const entries = await window.electronAPI.getDailyEntries(date, date);
       if (entries.length > 0) {
         setTodayEntry(entries[0]);
       } else {
-        // Create empty entry for today
+        // Create empty entry for the selected date
         const newEntry: DailyEntry = {
-          id: today,
-          date: today,
+          id: date,
+          date: date,
           meals: [],
           water: { glasses: 0, ounces: 0 },
           tags: [],
@@ -45,11 +46,44 @@ function Dashboard({ appData, onDataChange, onOpenWeightTracker }: DashboardProp
         setTodayEntry(newEntry);
       }
     } catch (error) {
-      console.error('Error loading today entry:', error);
+      console.error('Error loading entry for date:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handlePreviousDay = () => {
+    // Parse as local date to avoid timezone issues
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
+    currentDate.setDate(currentDate.getDate() - 1);
+    const newDate = currentDate.toISOString().split('T')[0];
+    setSelectedDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    // Parse as local date to avoid timezone issues
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const currentDate = new Date(year, month - 1, day);
+    currentDate.setDate(currentDate.getDate() + 1);
+    const newDate = currentDate.toISOString().split('T')[0];
+
+    // Don't allow going beyond today
+    if (newDate <= today) {
+      setSelectedDate(newDate);
+    }
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newDate = e.target.value;
+    // Don't allow selecting future dates
+    if (newDate <= today) {
+      setSelectedDate(newDate);
+    }
+  };
+
+  const isToday = selectedDate === today;
+  const isFutureDate = selectedDate > today;
 
   const calculateTotals = () => {
     if (!todayEntry) {
@@ -222,13 +256,58 @@ function Dashboard({ appData, onDataChange, onOpenWeightTracker }: DashboardProp
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">
-            {formatDisplayDate(new Date())}
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">Track your daily nutrition</p>
+      {/* Header with Date Navigation */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handlePreviousDay}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Previous day"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div className="flex items-center gap-3">
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={handleDateChange}
+                max={today}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {formatDisplayDate(selectedDate)}
+                </h2>
+                {!isToday && (
+                  <p className="text-xs text-gray-500">Past entry</p>
+                )}
+              </div>
+            </div>
+
+            <button
+              onClick={handleNextDay}
+              disabled={isToday}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Next day"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {!isToday && (
+            <button
+              onClick={() => setSelectedDate(today)}
+              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Today
+            </button>
+          )}
         </div>
       </div>
 

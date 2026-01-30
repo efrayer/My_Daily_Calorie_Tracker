@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A personal daily calorie and macro tracking app with encryption and OneDrive sync",
   "main": "dist/main/main.js",
-  "author": "Your Name",
+  "author": "ThinkDataAnalysis",
   "license": "MIT",
   "scripts": {
     "dev": "concurrently \"npm run dev:main\" \"npm run dev:renderer\"",
@@ -36,13 +36,16 @@
     "electron": "^39.2.7",
     "electron-builder": "^23.0.6",
     "postcss": "^8.4.32",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.3.6",
     "typescript": "^5.3.2",
     "vite": "^7.3.0"
   },
   "build": {
-    "appId": "com.dailycalorietracker.app",
+    "appId": "thinkdataanalysis.com/dailycalorietracker",
     "productName": "My Daily Calorie Tracker",
+    "copyright": "Copyright © 2026 ThinkDataAnalysis",
+    "icon": "icon.png",
     "directories": {
       "output": "release"
     },

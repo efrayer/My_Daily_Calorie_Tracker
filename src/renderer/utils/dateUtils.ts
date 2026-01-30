@@ -24,7 +24,12 @@ export const formatDisplayTime = (timeString: string): string => {
 };
 
 export const formatDisplayDate = (date: Date | string): string => {
-  return format(typeof date === 'string' ? new Date(date) : date, DISPLAY_DATE_FORMAT);
+  if (typeof date === 'string') {
+    // For date strings in yyyy-MM-dd format, parse as local date to avoid timezone issues
+    const [year, month, day] = date.split('-').map(Number);
+    return format(new Date(year, month - 1, day), DISPLAY_DATE_FORMAT);
+  }
+  return format(date, DISPLAY_DATE_FORMAT);
 };
 
 export const getTodayDateString = (): string => {
